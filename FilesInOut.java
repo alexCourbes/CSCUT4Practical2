@@ -1,34 +1,88 @@
 import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import javax.swing.*;
-import java.lang.Number;
+
 
 /**
- * 
  * CSCU9T4 Java strings and files exercise.
- *
  */
+
 public class FilesInOut {
 
     public static void main(String[] args) {
-        // Replace this with statements to set the file name (input) and file name (output).
-        // Initially it will be easier to hardcode suitable file names.
 
-        // Set up a new Scanner to read the input file.
-        // Processing line by line would be sensible here.
-        // Initially, echo the text to System.out to check you are reading correctly.
-        // Then add code to modify the text to the output format.
+        String inputFileName = "";
+        String upperCaseFlag = "";
+        String outputfileName = "";
 
-        // Set up a new PrintWriter to write the output file.
-        // Add suitable code into the above processing (because you need to do this line by line also.
-        // That is, read a line, write a line, loop.
 
-        // Finally, add code to read the filenames as arguments from the command line.
+        for (int i = 0; i < 1; i++) {
 
-        System.out.println("You need to add your own code to do anything");
+            if (args[0].toUpperCase().equals("-U")) {
+                upperCaseFlag = args[0];
+                inputFileName = args[1];
+                outputfileName = args[2];
 
-    } // main
+            } else {
+                inputFileName = args[0];
+                outputfileName = args[1];
+            }
+        }
 
-} // FilesInOut
+
+        try {
+
+
+            File inputFile = new File(inputFileName);
+            Scanner inFile = new Scanner(inputFile);
+            BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+
+            String line = reader.readLine();
+
+
+            Date d = null;
+            while (line != null) {
+                //Taking the dates from the names
+
+                SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyy"); //format what we have
+                SimpleDateFormat resformatter = new SimpleDateFormat("dd/MM/yyyy"); //format that we want
+                String value = line.replaceAll("[^0-9]", ""); //takes the date (erases any int)
+                d = formatter.parse(value); //parse the date from the old format to the new one
+
+
+                String name = line.replaceAll("[\\d.]", ""); //takes the full name (erases any non-int)
+                if (upperCaseFlag.toUpperCase().equals("-U")) { //if -U flag, then turn name to uppercase :)
+                    name = name.toUpperCase();
+                }else {
+
+                    name= name.substring(0, 1).toUpperCase() + name.substring(1);
+
+                }
+
+                appendData(name,outputfileName,resformatter,d);
+                //APENDING THE DATA INTO THE NEW FILE
+
+
+
+                line = reader.readLine(); //go to the next line of the file
+            }
+        } catch (IOException | ParseException e) {
+            System.err.println("IOException: " + e.getMessage() + "not found");
+        }
+    }
+
+    public static void appendData(String name, String outputfileName, SimpleDateFormat resformatter, Date d){
+        try {
+            FileWriter fw = new FileWriter(outputfileName, true); //the true will append the new data
+            fw.write(name + resformatter.format(d));//appends the string to the file
+            fw.write("\n"); // new line
+            fw.close();
+        } catch (IOException ioe) {
+            System.err.println("IOException: " + ioe.getMessage());
+        }
+    }
+
+
+    }
